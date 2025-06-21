@@ -1,6 +1,8 @@
 # 🎓 Government Exam Calendar
 
 A comprehensive web application that aggregates Indian government exam information from multiple sources and presents them in an interactive calendar interface. This platform solves the problem of students having to visit multiple websites to track government exam dates and application deadlines.
+<img width="724" alt="image" src="https://github.com/user-attachments/assets/15af990f-1011-45e8-89db-c482453d9d6a" />
+
 
 ## ✨ Features
 
