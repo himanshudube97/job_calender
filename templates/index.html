@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Government Exam Calendar - Your One-Stop Exam Portal</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-graduation-cap me-2"></i>
+                Government Exam Calendar
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#calendar-section">
+                            <i class="fas fa-calendar-alt me-1"></i>Calendar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#upcoming-section">
+                            <i class="fas fa-clock me-1"></i>Upcoming
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#stats-section">
+                            <i class="fas fa-chart-bar me-1"></i>Statistics
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="bg-gradient-primary text-white py-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-6 fw-bold mb-2">Your Complete Government Exam Guide</h1>
+                    <p class="lead mb-0">Track all government exam dates, application deadlines, and notifications in one place</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="d-flex justify-content-end gap-3">
+                        <div class="text-center">
+                            <div class="h3 mb-0 fw-bold">{{ total_exams }}</div>
+                            <small>Total Exams</small>
+                        </div>
+                        <div class="text-center">
+                            <div class="h3 mb-0 fw-bold">{{ upcoming_exams }}</div>
+                            <small>Upcoming</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats and Filters -->
+    <div class="container my-4" id="stats-section">
+        <div class="row">
+            <!-- Filter Section -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-filter me-2"></i>Filter Exams
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="get" action="/">
+                            <div class="mb-3">
+                                <label for="conducting_body" class="form-label">Conducting Body</label>
+                                <select class="form-select" id="conducting_body" name="conducting_body" onchange="updateCalendar()">
+                                    <option value="">All Conducting Bodies</option>
+                                    {% for body in conducting_bodies %}
+                                    <option value="{{ body }}" {% if body == selected_body %}selected{% endif %}>
+                                        {{ body }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-2"></i>Apply Filter
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Application Status Alerts -->
+                <div class="card border-0 shadow-sm mt-3">
+                    <div class="card-header bg-warning text-dark">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Application Alerts
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success alert-sm mb-2">
+                            <small><i class="fas fa-check-circle me-1"></i>Applications Open</small>
+                        </div>
+                        <div class="alert alert-warning alert-sm mb-2">
+                            <small><i class="fas fa-clock me-1"></i>Closing Soon</small>
+                        </div>
+                        <div class="alert alert-info alert-sm mb-0">
+                            <small><i class="fas fa-calendar me-1"></i>Opening Soon</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center border-0 shadow-sm bg-primary text-white">
+                            <div class="card-body">
+                                <i class="fas fa-graduation-cap fa-2x mb-2"></i>
+                                <h4 class="mb-0">{{ total_exams }}</h4>
+                                <small>Total Exams</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center border-0 shadow-sm bg-success text-white">
+                            <div class="card-body">
+                                <i class="fas fa-clock fa-2x mb-2"></i>
+                                <h4 class="mb-0">{{ upcoming_exams }}</h4>
+                                <small>Upcoming</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center border-0 shadow-sm bg-info text-white">
+                            <div class="card-body">
+                                <i class="fas fa-calendar-check fa-2x mb-2"></i>
+                                <h4 class="mb-0">{{ exams|length }}</h4>
+                                <small>This Month</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center border-0 shadow-sm bg-warning text-white">
+                            <div class="card-body">
+                                <i class="fas fa-building fa-2x mb-2"></i>
+                                <h4 class="mb-0">{{ conducting_bodies|length }}</h4>
+                                <small>Bodies</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Important Notice -->
+                <div class="alert alert-info border-0 shadow-sm">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle fa-lg"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="alert-heading">Stay Updated!</h6>
+                            <p class="mb-0">Always verify exam dates and application deadlines from official websites. Click on any exam for official notification links.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Section -->
+    <div class="container my-5" id="calendar-section">
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            Exam Calendar - Click on any exam for details
+                        </h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="calendar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Exams Section -->
+    <div class="container my-5" id="upcoming-section">
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-clock me-2"></i>
+                            Upcoming Exams & Application Deadlines
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        {% if exams %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th><i class="fas fa-graduation-cap me-1"></i>Exam Name</th>
+                                        <th><i class="fas fa-building me-1"></i>Conducting Body</th>
+                                        <th><i class="fas fa-calendar-check me-1"></i>Exam Date</th>
+                                        <th><i class="fas fa-hourglass-start me-1"></i>Application Status</th>
+                                        <th><i class="fas fa-link me-1"></i>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for exam in exams %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ exam.exam_name }}</strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary">{{ exam.conducting_body }}</span>
+                                        </td>
+                                        <td>
+                                            {% if exam.exam_date %}
+                                            <span class="text-success fw-bold">
+                                                {{ exam.exam_date.strftime('%d %b %Y') }}
+                                            </span>
+                                            {% else %}
+                                            <span class="text-muted">TBA</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if exam.application_start and exam.application_end %}
+                                                <span class="badge bg-info">
+                                                    <i class="fas fa-calendar me-1"></i>Available
+                                                </span>
+                                                <br>
+                                                <small class="text-muted">
+                                                    {{ exam.application_start.strftime('%d %b') }} - {{ exam.application_end.strftime('%d %b %Y') }}
+                                                </small>
+                                            {% else %}
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-question-circle me-1"></i>TBA
+                                            </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if exam.official_link %}
+                                            <a href="{{ exam.official_link }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-external-link-alt me-1"></i>View Details
+                                            </a>
+                                            {% else %}
+                                            <span class="text-muted">No link available</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No upcoming exams found</h5>
+                            <p class="text-muted">Try adjusting your filter or check back later for updates.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-graduation-cap me-2"></i>Government Exam Calendar</h5>
+                    <p class="mb-0">Your trusted companion for government exam preparation. Stay updated with all exam notifications and deadlines.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h6>Important Links</h6>
+                    <div class="d-flex flex-column">
+                        <a href="https://upsc.gov.in" target="_blank" class="text-light text-decoration-none mb-1">
+                            <i class="fas fa-external-link-alt me-1"></i>UPSC Official
+                        </a>
+                        <a href="https://ssc.nic.in" target="_blank" class="text-light text-decoration-none mb-1">
+                            <i class="fas fa-external-link-alt me-1"></i>SSC Official
+                        </a>
+                        <a href="https://www.ibps.in" target="_blank" class="text-light text-decoration-none">
+                            <i class="fas fa-external-link-alt me-1"></i>IBPS Official
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="text-center">
+                <small>&copy; 2024 Government Exam Calendar. Data compiled from official sources. Always verify from official websites.</small>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <!-- Custom JS -->
+    <script src="/static/js/calendar.js"></script>
+</body>
+</html> 
